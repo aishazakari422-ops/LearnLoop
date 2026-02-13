@@ -12,4 +12,9 @@ class CourseMaterial extends Model
     {
         return $this->belongsTo(Course::class);
     }
+
+    public function completedByStudents()
+    {
+        return $this->belongsToMany(User::class, 'course_material_user');
+    }
 }

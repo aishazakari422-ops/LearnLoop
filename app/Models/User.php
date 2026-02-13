@@ -71,4 +71,19 @@ class User extends Authenticatable
     {
         return $this->hasMany(LearningGoal::class);
     }
+
+    public function recommendationsReceived()
+    {
+        return $this->hasMany(Recommendation::class, 'student_id');
+    }
+
+    public function recommendationsSent()
+    {
+        return $this->hasMany(Recommendation::class, 'lecturer_id');
+    }
+
+    public function completedCourseMaterials()
+    {
+        return $this->belongsToMany(CourseMaterial::class, 'course_material_user');
+    }
 }

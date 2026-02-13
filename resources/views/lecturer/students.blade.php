@@ -53,13 +53,61 @@
                                     </td>
                                     <td style="padding: 1rem; text-align: right; color: var(--text-muted);">{{ $student->created_at->format('M d, Y') }}</td>
                                     <td style="padding: 1rem; text-align: right;">
-                                        <button class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="showToast('Recommendation feature coming soon!', 'info')">Recommend</button>
+                                        <button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;" 
+                                            data-toggle="modal" 
+                                            data-target="#recommendModal" 
+                                            onclick="setStudentId({{ $student->id }}, '{{ $student->name }}')">
+                                            Recommend
+                                        </button>
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Recommendation Modal -->
+                <div class="modal fade" id="recommendModal" tabindex="-1" role="dialog" aria-labelledby="recommendModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content border-0 shadow-lg" style="background: var(--card-bg); color: var(--text-main);">
+                            <form action="{{ route('recommendations.store') }}" method="POST">
+                                @csrf
+                                <input type="hidden" name="student_id" id="modal_student_id">
+                                <div class="modal-header border-0 pt-4 px-4">
+                                    <h5 class="modal-title font-weight-bold" id="recommendModalLabel">Recommend to <span id="modal_student_name"></span></h5>
+                                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body p-4">
+                                    <div class="form-group mb-3">
+                                        <label class="font-weight-bold text-muted small text-uppercase letter-spacing-wider">Material Title</label>
+                                        <input type="text" name="material_title" class="form-control" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;" placeholder="e.g., Advanced React Hooks Guide" required>
+                                    </div>
+                                    <div class="form-group mb-3">
+                                        <label class="font-weight-bold text-muted small text-uppercase letter-spacing-wider">Resource Link (Optional)</label>
+                                        <input type="url" name="material_link" class="form-control" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;" placeholder="https://...">
+                                    </div>
+                                    <div class="form-group mb-0">
+                                        <label class="font-weight-bold text-muted small text-uppercase letter-spacing-wider">Personal Note (Optional)</label>
+                                        <textarea name="note" class="form-control" rows="3" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white;" placeholder="Why are you recommending this?"></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer border-0 pb-4 px-4">
+                                    <button type="button" class="btn btn-outline" data-dismiss="modal">Cancel</button>
+                                    <button type="submit" class="btn btn-primary px-4">Send Recommendation</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <script>
+                    function setStudentId(id, name) {
+                        document.getElementById('modal_student_id').value = id;
+                        document.getElementById('modal_student_name').innerText = name;
+                    }
+                </script>
                 
                 <div style="margin-top: 2rem;">
                     {{ $students->links() }}

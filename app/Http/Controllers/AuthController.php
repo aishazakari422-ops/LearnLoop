@@ -76,7 +76,8 @@ class AuthController extends Controller
         } else {
             // Fetch goals for student with progress
             $goals = \App\Models\LearningGoal::where('user_id', $user->id)->with('progress')->latest()->get();
-            return view('student.dashboard', compact('goals'));
+            $recommendations = $user->recommendationsReceived()->with('lecturer')->latest()->take(3)->get();
+            return view('student.dashboard', compact('goals', 'recommendations'));
         }
     }
 }

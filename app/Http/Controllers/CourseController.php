@@ -99,6 +99,31 @@ class CourseController extends Controller
         return back()->with('success', 'Material removed successfully!');
     }
 
+    public function toggleMaterialComplete(\App\Models\CourseMaterial $material)
+    {
+        $user = auth()->user();
+        
+        // Ensure student is enrolled in the course
+        if (!$material->course->students()->where('user_id', $user->id)->exists()) {
+            abort(403);
+        }
+
+        $isCompleted = $user->completedCourseMaterials()->where('course_material_id', $material->id)->exists();
+
+        if ($isCompleted) {
+            $user->completedCourseMaterials()->detach($material->id);
+            $status = false;
+        } else {
+            $user->completedCourseMaterials()->attach($material->id);
+            $status = true;
+        }
+
+        return response()->json([
+            'success' => true,
+            'is_completed' => $status
+        ]);
+    }
+
     /**
      * Handle student enrollment.
      */

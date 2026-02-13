@@ -34,4 +34,25 @@ class LearningGoal extends Model
     {
         return $this->hasOne(Progress::class);
     }
+
+    /**
+     * Refresh the goal progress based on material completion.
+     */
+    public function refreshProgress()
+    {
+        $total = $this->materials()->count();
+        if ($total === 0) {
+            $percentage = 0;
+        } else {
+            $completed = $this->materials()->where('is_completed', true)->count();
+            $percentage = round(($completed / $total) * 100);
+        }
+
+        $this->progress()->updateOrCreate(
+            ['learning_goal_id' => $this->id],
+            ['percentage' => $percentage]
+        );
+
+        return $percentage;
+    }
 }

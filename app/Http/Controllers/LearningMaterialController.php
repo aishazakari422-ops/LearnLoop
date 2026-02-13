@@ -40,13 +40,46 @@ class LearningMaterialController extends Controller
             $contentUrl = Storage::url($path);
         }
 
-        \App\Models\LearningMaterial::create([
+        $material = \App\Models\LearningMaterial::create([
             'learning_goal_id' => $request->learning_goal_id,
             'title' => $request->title,
             'type' => $request->type,
             'content_url' => $contentUrl,
         ]);
 
+        $goal->refreshProgress();
+
         return back()->with('success', 'Material added successfully!');
+    }
+
+    public function toggleComplete(\App\Models\LearningMaterial $material)
+    {
+        if ($material->learningGoal->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            abort(403);
+        }
+
+        $material->is_completed = !$material->is_completed;
+        $material->save();
+
+        $percentage = $material->learningGoal->refreshProgress();
+
+        return response()->json([
+            'success' => true,
+            'is_completed' => $material->is_completed,
+            'percentage' => $percentage
+        ]);
+    }
+
+    public function destroy(\App\Models\LearningMaterial $material)
+    {
+        if ($material->learningGoal->user_id !== \Illuminate\Support\Facades\Auth::id()) {
+            abort(403);
+        }
+
+        $goal = $material->learningGoal;
+        $material->delete();
+        $goal->refreshProgress();
+
+        return back()->with('success', 'Material removed and progress updated!');
     }
 }

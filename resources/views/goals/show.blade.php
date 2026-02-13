@@ -41,24 +41,14 @@
             </div>
 
             <div style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1.5rem;">
-                <h4 style="margin-bottom: 1rem;">Current Progress</h4>
-                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                <h4 style="margin-bottom: 1rem;">Goal Progress</h4>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.5rem;">
                     <div style="flex: 1; height: 10px; background: rgba(255,255,255,0.1); border-radius: 5px; overflow: hidden;">
-                        <div style="width: {{ $goal->progress->percentage ?? 0 }}%; height: 100%; background: var(--primary);"></div>
+                        <div id="goal-progress-bar" style="width: {{ $goal->progress->percentage ?? 0 }}%; height: 100%; background: var(--primary); transition: width 0.5s ease;"></div>
                     </div>
-                    <span style="font-weight: 700; color: var(--primary);">{{ $goal->progress->percentage ?? 0 }}%</span>
+                    <span id="goal-progress-percent" style="font-weight: 700; color: var(--primary); min-width: 3rem; text-align: right;">{{ $goal->progress->percentage ?? 0 }}%</span>
                 </div>
-
-                <form action="{{ route('goals.update', $goal->id) }}" method="POST" style="display: flex; gap: 1rem; align-items: flex-end;">
-                    @csrf
-                    @method('PUT')
-                    
-                    <div style="flex: 1;">
-                        <label for="percentage" class="form-label">Update Progress (%)</label>
-                        <input type="number" name="percentage" id="percentage" class="form-control" min="0" max="100" value="{{ $goal->progress->percentage ?? 0 }}">
-                    </div>
-                    <button type="submit" class="btn btn-outline" style="padding: 0.75rem 1rem;">Update</button>
-                </form>
+                <p class="text-muted small">Progress is automatically calculated as you mark materials as done.</p>
             </div>
         </div>
 
@@ -72,7 +62,14 @@
                 @if($goal->materials->count() > 0)
                     <div style="display: grid; gap: 1rem;">
                         @foreach($goal->materials as $material)
-                            <div style="display: flex; align-items: center; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px;">
+                            <div style="display: flex; align-items: center; padding: 1rem; background: rgba(255,255,255,0.03); border-radius: 8px; border-left: 3px solid {{ $material->is_completed ? 'var(--primary)' : 'transparent' }}; transition: border-color 0.3s; opacity: {{ $material->is_completed ? '0.8' : '1' }};" id="material-{{ $material->id }}">
+                                <div style="margin-right: 1rem;">
+                                    <button class="btn-toggle-complete" 
+                                            onclick="toggleMaterial({{ $material->id }})"
+                                            style="background: {{ $material->is_completed ? 'var(--primary)' : 'rgba(255,255,255,0.05)' }}; border: 1px solid {{ $material->is_completed ? 'var(--primary)' : 'rgba(255,255,255,0.2)' }}; color: {{ $material->is_completed ? 'white' : 'var(--text-muted)' }}; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                    </button>
+                                </div>
                                 <div style="margin-right: 1rem; color: var(--accent);">
                                     @if($material->type == 'video')
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
@@ -83,12 +80,19 @@
                                     @endif
                                 </div>
                                 <div style="flex: 1;">
-                                    <h5 style="margin-bottom: 0.25rem;">{{ $material->title }}</h5>
+                                    <h5 style="margin-bottom: 0.25rem; {{ $material->is_completed ? 'text-decoration: line-through; color: var(--text-muted);' : '' }}" id="title-{{ $material->id }}">{{ $material->title }}</h5>
                                     <a href="{{ $material->content_url }}" target="_blank" style="color: var(--primary); font-size: 0.9rem;">{{ Str::limit($material->content_url, 40) }}</a>
                                 </div>
-                                <div>
+                                <div style="margin-right: 1rem;">
                                     <span style="font-size: 0.8rem; padding: 0.25rem 0.5rem; background: rgba(255,255,255,0.1); border-radius: 4px;">{{ strtoupper($material->type) }}</span>
                                 </div>
+                                <form action="{{ route('materials.destroy', $material) }}" method="POST" onsubmit="return confirm('Remove this material?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 0.5rem; opacity: 0.6;">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                    </button>
+                                </form>
                             </div>
                         @endforeach
                     </div>
@@ -144,6 +148,41 @@
                 </form>
 
                 <script>
+                    function toggleMaterial(id) {
+                        const btn = document.querySelector(`#material-${id} .btn-toggle-complete`);
+                        const row = document.getElementById(`material-${id}`);
+                        const title = document.getElementById(`title-${id}`);
+                        
+                        window.axios.patch(`/materials/${id}/toggle`)
+                            .then(response => {
+                                if (response.data.success) {
+                                    const isDone = response.data.is_completed;
+                                    
+                                    // Update Button UI
+                                    btn.style.background = isDone ? 'var(--primary)' : 'rgba(255,255,255,0.05)';
+                                    btn.style.borderColor = isDone ? 'var(--primary)' : 'rgba(255,255,255,0.2)';
+                                    btn.style.color = isDone ? 'white' : 'var(--text-muted)';
+                                    
+                                    // Update Row UI
+                                    row.style.borderColor = isDone ? 'var(--primary)' : 'transparent';
+                                    row.style.opacity = isDone ? '0.8' : '1';
+                                    title.style.textDecoration = isDone ? 'line-through' : 'none';
+                                    title.style.color = isDone ? 'var(--text-muted)' : 'white';
+                                    
+                                    // Update Goal Progress Bar
+                                    const percentage = response.data.percentage;
+                                    document.getElementById('goal-progress-bar').style.width = percentage + '%';
+                                    document.getElementById('goal-progress-percent').innerText = percentage + '%';
+                                    
+                                    if(window.showToast) window.showToast(isDone ? 'Material marked as done!' : 'Material marked as pending.', 'success');
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error toggling material:', error);
+                                if(window.showToast) window.showToast('Failed to update progress.', 'error');
+                            });
+                    }
+
                     function toggleMaterialInput() {
                         const type = document.getElementById('material_type').value;
                         const urlGroup = document.getElementById('url_input_group');

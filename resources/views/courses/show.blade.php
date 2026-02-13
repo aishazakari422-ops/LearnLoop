@@ -73,11 +73,36 @@
                             @endif
                         </div>
                         <div class="card-body px-4 pb-4">
+                            @if($isEnrolled && $course->materials->count() > 0)
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="text-muted small font-weight-bold">Your Course Progress</span>
+                                        <span class="text-primary small font-weight-bold" id="course-progress-percent">
+                                            {{ round((count($completedMaterialIds ?? []) / $course->materials->count()) * 100) }}%
+                                        </span>
+                                    </div>
+                                    <div class="progress" style="height: 6px;">
+                                        <div id="course-progress-bar" class="progress-bar bg-primary" role="progressbar" 
+                                             style="width: {{ round((count($completedMaterialIds ?? []) / $course->materials->count()) * 100) }}%; transition: width 0.5s ease;"></div>
+                                    </div>
+                                </div>
+                            @endif
+
                             <div class="list-group list-group-flush">
                                 @forelse($course->materials as $material)
-                                    <div class="list-group-item px-0 py-3 border-0 border-bottom">
+                                    @php $isDone = in_array($material->id, $completedMaterialIds ?? []); @endphp
+                                    <div class="list-group-item px-0 py-3 border-0 border-bottom" id="material-{{ $material->id }}" style="opacity: {{ $isDone ? '0.7' : '1' }};">
                                         <div class="d-flex justify-content-between align-items-start">
                                             <div class="d-flex align-items-start">
+                                                @if($isEnrolled)
+                                                    <div class="mr-3" style="padding-top: 2px;">
+                                                        <button class="btn-toggle-course-material" 
+                                                                onclick="toggleCourseMaterial({{ $material->id }})"
+                                                                style="background: {{ $isDone ? 'var(--primary)' : 'rgba(0,0,0,0.05)' }}; border: 1px solid {{ $isDone ? 'var(--primary)' : 'rgba(0,0,0,0.1)' }}; color: {{ $isDone ? 'white' : 'transparent' }}; border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                                                        </button>
+                                                    </div>
+                                                @endif
                                                 <div class="mr-3 mt-1">
                                                     @if($material->type === 'note')
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4f46e5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -88,10 +113,10 @@
                                                     @endif
                                                 </div>
                                                 <div>
-                                                    <h5 class="h6 font-weight-bold mb-1 text-dark">{{ $material->title }}</h5>
+                                                    <h5 class="h6 font-weight-bold mb-1 {{ $isDone ? 'text-muted text-decoration-line-through' : 'text-dark' }}" id="title-{{ $material->id }}">{{ $material->title }}</h5>
                                                     <div class="text-muted small">
                                                         @if($material->type === 'link')
-                                                            <a href="{{ $material->content }}" target="_blank" class="text-primary">{{ $material->content }}</a>
+                                                            <a href="{{ $material->content }}" target="_blank" class="text-primary">{{ Str::limit($material->content, 40) }}</a>
                                                         @else
                                                             {{ $material->content }}
                                                         @endif
@@ -197,4 +222,50 @@
         </div>
     </div>
 </div>
+@if($isEnrolled)
+<script>
+    function toggleCourseMaterial(materialId) {
+        const btn = document.querySelector(`#material-${materialId} .btn-toggle-course-material`);
+        const item = document.getElementById(`material-${materialId}`);
+        const title = document.getElementById(`title-${materialId}`);
+        const totalMaterials = {{ $course->materials->count() }};
+        
+        window.axios.patch(`/courses/materials/${materialId}/toggle`)
+            .then(response => {
+                if (response.data.success) {
+                    const isDone = response.data.is_completed;
+                    
+                    // Update Button UI
+                    btn.style.background = isDone ? 'var(--primary)' : 'rgba(0,0,0,0.05)';
+                    btn.style.borderColor = isDone ? 'var(--primary)' : 'rgba(0,0,0,0.1)';
+                    btn.style.color = isDone ? 'white' : 'transparent';
+                    
+                    // Update Item UI
+                    item.style.opacity = isDone ? '0.7' : '1';
+                    if (isDone) {
+                        title.classList.add('text-muted', 'text-decoration-line-through');
+                        title.classList.remove('text-dark');
+                    } else {
+                        title.classList.remove('text-muted', 'text-decoration-line-through');
+                        title.classList.add('text-dark');
+                    }
+                    
+                    // Update Course Progress Bar (Approximate calculation on client side for immediate feedback)
+                    // Better: re-query count or pass from server
+                    const completedCount = document.querySelectorAll('.btn-toggle-course-material[style*="background: var(--primary)"]').length;
+                    const percentage = Math.round((completedCount / totalMaterials) * 100);
+                    
+                    document.getElementById('course-progress-bar').style.width = percentage + '%';
+                    document.getElementById('course-progress-percent').innerText = percentage + '%';
+                    
+                    if(window.showToast) window.showToast(isDone ? 'Marked as completed!' : 'Marked as pending.', 'success');
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling course material:', error);
+                if(window.showToast) window.showToast('Failed to update progress.', 'error');
+            });
+    }
+</script>
+@endif
 @endsection

@@ -25,12 +25,14 @@ Route::middleware(['auth'])->group(function () {
 
     // Resources
     Route::resource('goals', LearningGoalController::class);
+    Route::patch('/materials/{material}/toggle', [LearningMaterialController::class, 'toggleComplete'])->name('materials.toggle');
     Route::resource('materials', LearningMaterialController::class);
     Route::resource('recommendations', RecommendationController::class);
     
     // Course & Forum Routes
     Route::resource('courses', \App\Http\Controllers\CourseController::class);
     Route::post('/courses/{course}/enroll', [\App\Http\Controllers\CourseController::class, 'enroll'])->name('courses.enroll');
+    Route::patch('/courses/materials/{material}/toggle', [\App\Http\Controllers\CourseController::class, 'toggleMaterialComplete'])->name('courses.materials.toggle');
     Route::post('/courses/{course}/materials', [\App\Http\Controllers\CourseController::class, 'storeMaterial'])->name('courses.materials.store');
     Route::delete('/courses/{course}/materials/{material}', [\App\Http\Controllers\CourseController::class, 'destroyMaterial'])->name('courses.materials.destroy');
     
