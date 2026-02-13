@@ -49,5 +49,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/lecturer/students', [\App\Http\Controllers\LecturerController::class, 'students'])->name('lecturer.students');
     
     // Admin Routes
-    Route::get('/admin/users', [AdminController::class, 'index'])->name('admin.users');
+    Route::group(['prefix' => 'admin', 'as' => 'admin.'], function() {
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+        Route::get('/users', [AdminController::class, 'users'])->name('users');
+        Route::patch('/users/{user}/role', [AdminController::class, 'updateRole'])->name('users.role');
+        Route::delete('/users/{user}', [AdminController::class, 'destroyUser'])->name('users.destroy');
+        Route::get('/courses', [AdminController::class, 'courses'])->name('courses');
+    });
 });
