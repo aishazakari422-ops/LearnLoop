@@ -34,6 +34,7 @@ class LearningGoal extends Model
     {
         return $this->hasOne(Progress::class);
     }
+<<<<<<< HEAD
 
     /**
      * Refresh the goal progress based on material completion.
@@ -55,4 +56,6 @@ class LearningGoal extends Model
 
         return $percentage;
     }
+=======
+>>>>>>> origin/main
 }

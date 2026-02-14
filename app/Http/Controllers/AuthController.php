@@ -70,14 +70,22 @@ class AuthController extends Controller
         $user = Auth::user();
         
         if ($user->role === 'admin') {
+<<<<<<< HEAD
             return redirect()->route('admin.dashboard'); 
+=======
+            return view('admin.dashboard'); 
+>>>>>>> origin/main
         } elseif ($user->role === 'lecturer') {
             return view('lecturer.dashboard');
         } else {
             // Fetch goals for student with progress
             $goals = \App\Models\LearningGoal::where('user_id', $user->id)->with('progress')->latest()->get();
+<<<<<<< HEAD
             $recommendations = $user->recommendationsReceived()->with('lecturer')->latest()->take(3)->get();
             return view('student.dashboard', compact('goals', 'recommendations'));
+=======
+            return view('student.dashboard', compact('goals'));
+>>>>>>> origin/main
         }
     }
 }

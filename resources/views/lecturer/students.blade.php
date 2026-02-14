@@ -53,18 +53,23 @@
                                     </td>
                                     <td style="padding: 1rem; text-align: right; color: var(--text-muted);">{{ $student->created_at->format('M d, Y') }}</td>
                                     <td style="padding: 1rem; text-align: right;">
+<<<<<<< HEAD
                                         <button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;" 
                                             data-toggle="modal" 
                                             data-target="#recommendModal" 
                                             onclick="setStudentId({{ $student->id }}, '{{ $student->name }}')">
                                             Recommend
                                         </button>
+=======
+                                        <button class="btn btn-outline" style="padding: 0.25rem 0.75rem; font-size: 0.8rem;" onclick="showToast('Recommendation feature coming soon!', 'info')">Recommend</button>
+>>>>>>> origin/main
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
+<<<<<<< HEAD
 
                 <!-- Recommendation Modal -->
                 <div class="modal fade" id="recommendModal" tabindex="-1" role="dialog" aria-labelledby="recommendModalLabel" aria-hidden="true">
@@ -108,6 +113,8 @@
                         document.getElementById('modal_student_name').innerText = name;
                     }
                 </script>
+=======
+>>>>>>> origin/main
                 
                 <div style="margin-top: 2rem;">
                     {{ $students->links() }}

@@ -40,13 +40,18 @@ class LearningMaterialController extends Controller
             $contentUrl = Storage::url($path);
         }
 
+<<<<<<< HEAD
         $material = \App\Models\LearningMaterial::create([
+=======
+        \App\Models\LearningMaterial::create([
+>>>>>>> origin/main
             'learning_goal_id' => $request->learning_goal_id,
             'title' => $request->title,
             'type' => $request->type,
             'content_url' => $contentUrl,
         ]);
 
+<<<<<<< HEAD
         $goal->refreshProgress();
 
         return back()->with('success', 'Material added successfully!');
@@ -82,4 +87,8 @@ class LearningMaterialController extends Controller
 
         return back()->with('success', 'Material removed and progress updated!');
     }
+=======
+        return back()->with('success', 'Material added successfully!');
+    }
+>>>>>>> origin/main
 }

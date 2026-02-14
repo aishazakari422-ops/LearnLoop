@@ -54,6 +54,7 @@ class LearningGoalController extends Controller
             abort(403);
         }
 
+<<<<<<< HEAD
         $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'required|string',
@@ -64,5 +65,18 @@ class LearningGoalController extends Controller
         $goal->update($request->only(['title', 'description', 'start_date', 'target_date']));
 
         return redirect()->route('goals.show', $goal->id)->with('success', 'Goal updated successfully!');
+=======
+        // Handle simple progress update
+        if ($request->has('percentage')) {
+            $goal->progress()->updateOrCreate(
+                ['learning_goal_id' => $goal->id],
+                ['percentage' => $request->percentage]
+            );
+            return back()->with('success', 'Progress updated successfully!');
+        }
+
+        // Handle other updates if needed
+        return back();
+>>>>>>> origin/main
     }
 }

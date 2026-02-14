@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Recommendation extends Model
 {
+<<<<<<< HEAD
     protected $fillable = [
         'student_id',
         'lecturer_id',
@@ -23,4 +24,7 @@ class Recommendation extends Model
     {
         return $this->belongsTo(User::class, 'lecturer_id');
     }
+=======
+    //
+>>>>>>> origin/main
 }

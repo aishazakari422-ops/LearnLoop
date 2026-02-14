@@ -11,7 +11,10 @@ class LearningMaterial extends Model
         'title',
         'type',
         'content_url',
+<<<<<<< HEAD
         'is_completed',
+=======
+>>>>>>> origin/main
     ];
 
     public function learningGoal()

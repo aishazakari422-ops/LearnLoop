@@ -129,6 +129,7 @@ nav {
 }
 
 .btn-outline {
+<<<<<<< HEAD
     border: 1px solid rgba(255, 255, 255, 0.6);
     color: white;
     background: transparent;
@@ -139,6 +140,15 @@ nav {
     border-color: white;
     color: white;
     transform: translateY(-2px);
+=======
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.btn-outline:hover {
+    border-color: var(--primary);
+    color: var(--primary);
+>>>>>>> origin/main
 }
 
 /* Hero Section */

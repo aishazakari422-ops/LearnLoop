@@ -46,6 +46,7 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+<<<<<<< HEAD
 
     public function instructedCourses()
     {
@@ -86,4 +87,6 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(CourseMaterial::class, 'course_material_user');
     }
+=======
+>>>>>>> origin/main
 }

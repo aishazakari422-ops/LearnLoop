@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+<<<<<<< HEAD
 use App\Models\Recommendation;
 use Illuminate\Support\Facades\Auth;
 
@@ -64,4 +65,9 @@ class RecommendationController extends Controller
 
         return back()->with('success', 'Recommendation removed successfully!');
     }
+=======
+class RecommendationController extends Controller
+{
+    //
+>>>>>>> origin/main
 }

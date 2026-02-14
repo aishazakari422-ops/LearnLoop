@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
+<<<<<<< HEAD
     public function dashboard()
     {
         $stats = [
@@ -60,4 +61,11 @@ class AdminController extends Controller
         $courses = \App\Models\Course::with('instructor')->withCount('students')->latest()->paginate(15);
         return view('admin.courses', compact('courses'));
     }
+=======
+    public function index()
+    {
+        $users = \App\Models\User::paginate(10);
+        return view('admin.users', compact('users'));
+    }
+>>>>>>> origin/main
 }
